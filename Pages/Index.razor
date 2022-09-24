@@ -1,3 +1,44 @@
 ﻿@page "/"
 
 <h1>Hummer</h1>
+
+<BECanvas Width="@WIDTH" Height="@HEIGHT" @ref="canvasReference"></BECanvas>
+
+@code {
+    private const int WIDTH = 1000;
+    private const int HEIGHT = 400;
+    private const int STROKE_WIDTH = 10;
+
+    /// <summary>Organised highest to lowest</summary>
+    private enum LANE_HEIGHT
+    {
+        ONE = STROKE_WIDTH / 2,
+        TWO = HEIGHT / 4,
+        THREE = HEIGHT / 2,
+        FOUR = 3 * (HEIGHT / 4),
+        FIVE = HEIGHT - (STROKE_WIDTH / 2),
+    };
+    private readonly Vehicle[] vehicleList = new [] {
+        new Vehicle { Colour = "red", Length = 20, SpawnRate = 0.5d, Width = 20, X = 0 },
+        new Vehicle { Colour = "blue", Length = 40, SpawnRate = 0.5d, Width = 20, X = 0 },
+    };
+
+    private BECanvasComponent? canvasReference;
+    private Canvas2DContext? context;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        this.context = await this.canvasReference.CreateCanvas2DAsync();
+        await this.context.SetLineWidthAsync(STROKE_WIDTH);
+
+        int[] laneHeights = Array.ConvertAll(Enum.GetValues<LANE_HEIGHT>(), height => (int) height);
+
+        foreach (int currentHeight in laneHeights)
+        {
+            await this.context.BeginPathAsync();
+            await this.context.MoveToAsync(0, currentHeight);
+            await this.context.LineToAsync(WIDTH, currentHeight);
+            await this.context.StrokeAsync();
+        }
+    }
+}
