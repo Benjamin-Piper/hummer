@@ -40,5 +40,8 @@
             await this.context.LineToAsync(WIDTH, currentHeight);
             await this.context.StrokeAsync();
         }
+        
+        ISimulation simulation = new Traffic(this.context!, laneHeights, this.vehicleList);
+        await simulation.StartClock();
     }
 }
