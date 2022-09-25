@@ -41,7 +41,15 @@
         for (int i = 1; i <= divisions; i += 2)
         {
             var heightPercentage = HEIGHT * (i / divisions);
-            lanes.Add(new Lane(context, Direction.Right, new Point{ X = 0, Y = (int) heightPercentage }, WIDTH));
+            var offscreenOffset = 40;
+            if ((i / divisions) >= 0.5f)
+            {
+                lanes.Add(new Lane(context, Direction.Left, new Point{ X = WIDTH + offscreenOffset, Y = (int) heightPercentage }, WIDTH));
+            }
+            else
+            {
+                lanes.Add(new Lane(context, Direction.Right, new Point{ X = -offscreenOffset, Y = (int) heightPercentage }, WIDTH));
+            }
         }
         return lanes;
     }
