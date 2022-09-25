@@ -47,15 +47,24 @@ namespace Hummer.Model
 
         public async Task StartClock()
         {
-            var lane = RandomlyChooseLane(this.lanes.FindAll(l => l.IsAvailabe()));
-            lane.SpawnVehicle(RandomlyChooseVehicle());
+            var counter = 0;
             while (true)
             {
+                if (counter % 100 == 0)
+                {
+                    var availableLanes = this.lanes.FindAll((l) => l.IsAvailabe());
+                    if (availableLanes.Count > 0)
+                    {
+                        var lane = this.RandomlyChooseLane(availableLanes);
+                        lane.SpawnVehicle(RandomlyChooseVehicle());
+                    }
+                }
                 foreach (var currentLane in this.lanes)
                 {
                     await currentLane.Animate();
                 }
                 await Task.Delay(10);
+                counter++;
             }
         }      
     }
