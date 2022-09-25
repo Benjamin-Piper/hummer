@@ -38,6 +38,10 @@ namespace Hummer.Model
                 }
                 lowerBound += candidateVehicle.SpawnRate;
             }
+            if (upperBound <= spawnNumber)
+            {
+                return vehicleTypes.Last();
+            }
             throw new SpawnRateOutOfRangeException("There must be at least one vehicle.SpawnRate between 0 and 1");
         }
 
