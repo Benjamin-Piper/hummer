@@ -7,41 +7,65 @@
 @code {
     private const int WIDTH = 1000;
     private const int HEIGHT = 400;
+    private const int LANE_COUNT = 4;
     private const int STROKE_WIDTH = 10;
-
-    /// <summary>Organised highest to lowest</summary>
-    private enum LANE_HEIGHT
-    {
-        ONE = STROKE_WIDTH / 2,
-        TWO = HEIGHT / 4,
-        THREE = HEIGHT / 2,
-        FOUR = 3 * (HEIGHT / 4),
-        FIVE = HEIGHT - (STROKE_WIDTH / 2),
-    };
-    private readonly Vehicle[] vehicleList = new [] {
-        new Vehicle { Colour = "red", Length = 20, SpawnRate = 0.5d, Width = 20, X = 0 },
-        new Vehicle { Colour = "blue", Length = 40, SpawnRate = 0.5d, Width = 20, X = 0 },
-    };
 
     private BECanvasComponent? canvasReference;
     private Canvas2DContext? context;
+
+    private List<int> GetLaneLineHeights()
+    {
+        var laneLineHeights = new List<int>(LANE_COUNT + 1);
+        float divisions = LANE_COUNT * 2;
+        for (int i = 0; i <= divisions; i += 2)
+        {
+            var heightPercentage = HEIGHT * (i / divisions);
+            var offset = STROKE_WIDTH / 2;
+            if (i == 0)
+            {
+                laneLineHeights.Add(offset);
+            }
+            else
+            {
+                laneLineHeights.Add((int) heightPercentage - offset);
+            }
+        }
+        return laneLineHeights;
+    }
+
+    // Passing the context as a parameter to ensure it is non-nullable
+    private List<ILane> CreateLanes(Canvas2DContext context)
+    {
+        var lanes = new List<ILane>(LANE_COUNT);
+        float divisions = LANE_COUNT * 2;
+        for (int i = 1; i <= divisions; i += 2)
+        {
+            var heightPercentage = HEIGHT * (i / divisions);
+            lanes.Add(new Lane(context, Direction.Right, new Point{ X = 0, Y = (int) heightPercentage }, WIDTH));
+        }
+        return lanes;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         this.context = await this.canvasReference.CreateCanvas2DAsync();
         await this.context.SetLineWidthAsync(STROKE_WIDTH);
 
-        int[] laneHeights = Array.ConvertAll(Enum.GetValues<LANE_HEIGHT>(), height => (int) height);
-
-        foreach (int currentHeight in laneHeights)
+        foreach (var currentHeight in this.GetLaneLineHeights())
         {
             await this.context.BeginPathAsync();
             await this.context.MoveToAsync(0, currentHeight);
             await this.context.LineToAsync(WIDTH, currentHeight);
             await this.context.StrokeAsync();
         }
-        
-        ISimulation simulation = new Traffic(this.context!, laneHeights, this.vehicleList);
+
+        var lanes = this.CreateLanes(context!);
+        var vehicleTypes = new List<Vehicle>() {
+            new Vehicle { Colour = "red", Length = 20, SpawnRate = 0.5d, Width = 20, },
+            new Vehicle { Colour = "blue", Length = 40, SpawnRate = 0.5d, Width = 20, },
+        };
+
+        ISimulation simulation = new Traffic(lanes, vehicleTypes);
         await simulation.StartClock();
     }
 }
