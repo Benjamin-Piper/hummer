@@ -61,8 +61,20 @@
 
         var lanes = this.CreateLanes(context!);
         var vehicleTypes = new List<Vehicle>() {
-            new Vehicle { Colour = "red", Length = 20, SpawnRate = 0.5d, Width = 20, },
-            new Vehicle { Colour = "blue", Length = 40, SpawnRate = 0.5d, Width = 20, },
+            new Vehicle { Colour = "silver", Length = 20, SpawnRate = 0.2261312530508752d, Width = 20, },
+            new Vehicle { Colour = "white", Length = 20, SpawnRate = 0.20309379786718001d, Width = 20, },
+            new Vehicle { Colour = "blue", Length = 20, SpawnRate = 0.12751147282100564d, Width = 20, },
+            new Vehicle { Colour = "grey", Length = 20, SpawnRate = 0.10389884636748835d, Width = 20, },
+            new Vehicle { Colour = "black", Length = 20, SpawnRate = 0.10332750064651776d, Width = 20, },
+            new Vehicle { Colour = "red", Length = 20, SpawnRate = 0.10327815106633349d, Width = 20, },
+            new Vehicle { Colour = "green", Length = 20, SpawnRate = 0.0577977309904652d, Width = 20, },
+            new Vehicle { Colour = "gold", Length = 20, SpawnRate = 0.019150314995692433d, Width = 20, },
+            new Vehicle { Colour = "brown", Length = 20, SpawnRate = 0.016805827382054505d, Width = 20, },
+            new Vehicle { Colour = "yellow", Length = 20, SpawnRate = 0.014376795138798564d, Width = 20, },
+            new Vehicle { Colour = "orange", Length = 20, SpawnRate = 0.011366088192673002d, Width = 20, },
+            new Vehicle { Colour = "purple", Length = 20, SpawnRate = 0.006265675186418996d, Width = 20, },
+            new Vehicle { Colour = "cream", Length = 20, SpawnRate = 0.005569234018004563d, Width = 20, },
+            new Vehicle { Colour = "pink", Length = 20, SpawnRate = 0.0014273122764923085d, Width = 20, },
         };
 
         ISimulation simulation = new Traffic(lanes, vehicleTypes);
