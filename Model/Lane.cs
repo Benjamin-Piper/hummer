@@ -28,6 +28,8 @@ namespace Hummer.Model
 
         public async Task Animate()
         {
+            var despawnTasks = new List<Task>();
+            
             foreach (var currentVehicle in this.movingVehicles)
             {
                 await this.EraseVehicle(currentVehicle);
@@ -39,7 +41,19 @@ namespace Hummer.Model
                 {
                     currentVehicle.X++;
                 }
+
+                if (this.IsOffscreen(currentVehicle))
+                {
+                    despawnTasks.Add(new Task(() => DespawnVehicle(currentVehicle)));
+                }
+
                 await this.DrawVehicle(currentVehicle);
+            }
+
+            // Despawn outside of foreach, we can't modify a List in a foreach
+            foreach (var task in despawnTasks)
+            {
+                task.Start();
             }
         }
 
@@ -93,6 +107,23 @@ namespace Hummer.Model
             });
 
             return !someVehicleIsInTheWay;
+        }
+
+        public bool IsOffscreen(Vehicle vehicle)
+        {
+            if (this.direction == Direction.Left)
+            {
+                return vehicle.RightEdge < (this.origin.X - this.width);
+            }
+            else
+            {
+                return (this.origin.X + this.width) < vehicle.LeftEdge;
+            }
+        }
+
+        public void DespawnVehicle(Vehicle vehicle)
+        {
+            this.movingVehicles.Remove(vehicle);
         }
 
         public void SpawnVehicle(Vehicle vehicle)
