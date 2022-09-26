@@ -1,5 +1,17 @@
 namespace Hummer.Model
 {
+    /*
+        L = length
+        W = width
+
+        (LeftEdge) +-------------+ (RightEdge)
+                    |             |
+                    | (X)+---+(L) |
+                    |    |   |    |
+                    | (W)+---+    |
+                    |             |
+        (TotalWidth) +-------------+
+    */
     public record class Vehicle
     {
         public string Colour { get; init; } = "red";

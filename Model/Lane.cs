@@ -42,19 +42,6 @@ namespace Hummer.Model
             }
         }
 
-        /*
-            O = origin (x,y)
-            L = length
-            W = width
-
-            +-------------+
-            |             |
-            |    O---L    |
-            |    |   |    |
-            |    W---+    |
-            |             |
-            +-------------+
-        */
         private async Task DrawVehicle(Vehicle currentVehicle)
         {
             // Must be called before every drawing. Not including this cost me hours of debugging :(
@@ -76,19 +63,6 @@ namespace Hummer.Model
             return this.origin.Y - (currentVehicle.Width / 2) - Vehicle.StrokeWidth;
         }
 
-        /*
-            O = origin (x,y)
-            L = length
-            W = width
-
-            O-------------L
-            |             |
-            |    +---+    |
-            |    |   |    |
-            |    +---+    |
-            |             |
-            W-------------+
-        */
         private async Task EraseVehicle(Vehicle currentVehicle)
         {
             await this.context.ClearRectAsync(
