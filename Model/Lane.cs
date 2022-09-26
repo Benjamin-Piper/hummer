@@ -27,18 +27,18 @@ namespace Hummer.Model
 
         public async Task Animate()
         {
-            foreach (var vehicle in this.movingVehicles)
+            foreach (var currentVehicle in this.movingVehicles)
             {
-                await this.EraseVehicle(vehicle);
+                await this.EraseVehicle(currentVehicle);
                 if (this.direction == Direction.Left)
                 {
-                    vehicle.X--;
+                    currentVehicle.X--;
                 }
                 else
                 {
-                    vehicle.X++;
+                    currentVehicle.X++;
                 }
-                await this.DrawVehicle(vehicle);
+                await this.DrawVehicle(currentVehicle);
             }
         }
 
@@ -55,25 +55,25 @@ namespace Hummer.Model
             |             |
             +-------------+
         */
-        private async Task DrawVehicle(Vehicle vehicle)
+        private async Task DrawVehicle(Vehicle currentVehicle)
         {
             // Must be called before every drawing. Not including this cost me hours of debugging :(
             await this.context.BeginPathAsync();
-            await this.context.SetFillStyleAsync(vehicle.Colour);
+            await this.context.SetFillStyleAsync(currentVehicle.Colour);
             await this.context.SetLineWidthAsync(Vehicle.StrokeWidth);
             await this.context.RectAsync(
-                vehicle.X,
-                GetDrawHeight(vehicle),
-                vehicle.Length,
-                vehicle.Width
+                currentVehicle.X,
+                GetDrawHeight(currentVehicle),
+                currentVehicle.Length,
+                currentVehicle.Width
             );
             await this.context.FillAsync();
             await this.context.StrokeAsync();
         }
 
-        private double GetDrawHeight(Vehicle vehicle)
+        private double GetDrawHeight(Vehicle currentVehicle)
         {
-            return this.origin.Y - (vehicle.Width / 2) - Vehicle.StrokeWidth;
+            return this.origin.Y - (currentVehicle.Width / 2) - Vehicle.StrokeWidth;
         }
 
         /*
@@ -89,13 +89,13 @@ namespace Hummer.Model
             |             |
             W-------------+
         */
-        private async Task EraseVehicle(Vehicle vehicle)
+        private async Task EraseVehicle(Vehicle currentVehicle)
         {
             await this.context.ClearRectAsync(
-                vehicle.LeftEdge,
-                GetDrawHeight(vehicle) - Vehicle.StrokeWidth,
-                vehicle.TotalLength,
-                vehicle.TotalWidth
+                currentVehicle.LeftEdge,
+                GetDrawHeight(currentVehicle) - Vehicle.StrokeWidth,
+                currentVehicle.TotalLength,
+                currentVehicle.TotalWidth
             );
         }
 
