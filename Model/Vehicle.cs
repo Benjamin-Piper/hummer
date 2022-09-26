@@ -4,7 +4,7 @@ namespace Hummer.Model
         L = length
         W = width
 
-        (LeftEdge) +-------------+ (RightEdge)
+        (LeftEdge) +-------------+ (TotalLength)
                     |             |
                     | (X)+---+(L) |
                     |    |   |    |
