@@ -14,8 +14,9 @@ namespace Hummer.Model
         private readonly Canvas2DContext context;
         private readonly Direction direction;
         private readonly Point origin;
-        private readonly List<Vehicle> movingVehicles = new List<Vehicle>();
         private readonly int width;
+        private const int MAX_VEHICLES = 5;
+        private readonly List<Vehicle> movingVehicles = new List<Vehicle>(MAX_VEHICLES);
 
         public Lane(Canvas2DContext context, Direction direction, Point origin, int width)
         {
@@ -75,7 +76,23 @@ namespace Hummer.Model
 
         public bool IsAvailabe()
         {
-            return true;
+            if (movingVehicles.Count == MAX_VEHICLES)
+            {
+                return false;
+            }
+
+            var someVehicleIsInTheWay = movingVehicles.Any((currentVehicle) => {
+                if (this.direction == Direction.Left)
+                {
+                    return (this.origin.X - Vehicle.MinBumperDistance) < currentVehicle.RightEdge;
+                }
+                else
+                {
+                    return currentVehicle.LeftEdge < (this.origin.X + Vehicle.MinBumperDistance);
+                }
+            });
+
+            return !someVehicleIsInTheWay;
         }
 
         public void SpawnVehicle(Vehicle vehicle)

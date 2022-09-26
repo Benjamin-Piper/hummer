@@ -18,6 +18,7 @@ namespace Hummer.Model
         public int LeftEdge => this.X - Vehicle.StrokeWidth;
         public int Length { get; init; }
         public const int MinBumperDistance = 20;
+        public int RightEdge => this.X + this.Length + Vehicle.StrokeWidth;
         /// <summary>Spawnrate must be between 0 and 1</summary>
         public double SpawnRate { get; init; }
         public const int StrokeWidth = 2;
