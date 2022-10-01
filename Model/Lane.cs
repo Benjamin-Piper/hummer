@@ -13,13 +13,15 @@ namespace Hummer.Model
     {
         private readonly Canvas2DContext context;
         private readonly LaneConfig config;
+        private readonly FootBridge footBridge;
         private const int MAX_VEHICLES = 5;
         private readonly List<Vehicle> movingVehicles = new List<Vehicle>(MAX_VEHICLES);
 
-        public Lane(Canvas2DContext context, LaneConfig config)
+        public Lane(Canvas2DContext context, LaneConfig config, FootBridge footBridge)
         {
             this.context = context;
             this.config = config;
+            this.footBridge = footBridge;
         }  
 
         public async Task Animate()
@@ -58,6 +60,21 @@ namespace Hummer.Model
             );
             await this.context.FillAsync();
             await this.context.StrokeAsync();
+
+            if (this.IsUnderFootBridge(currentVehicle))
+            {
+                // We redraw this instead of setting globalCompositeOperation to destination-over
+                // Is because we are constantly erasing the vehicles
+                await this.context.BeginPathAsync();
+                await this.context.SetFillStyleAsync(this.footBridge.Colour);
+                await this.context.RectAsync(
+                    this.footBridge.LeftEdge,
+                    GetDrawHeight() - Vehicle.StrokeWidth,
+                    this.footBridge.Width,
+                    Vehicle.OuterWidth
+                );
+                await this.context.FillAsync();
+            }
         }
 
         private double GetDrawHeight()
@@ -94,6 +111,18 @@ namespace Hummer.Model
             });
 
             return !someVehicleIsInTheWay;
+        }
+
+        private bool IsUnderFootBridge(Vehicle vehicle)
+        {
+            var EdgeIsUnder = (int x) => this.footBridge.LeftEdge <= x && x <= this.footBridge.RightEdge;
+            var EdgeOnEitherSide = vehicle.LeftEdge < this.footBridge.LeftEdge && this.footBridge.RightEdge < vehicle.RightEdge;
+            return new List<bool>()
+            {
+                EdgeIsUnder(vehicle.LeftEdge),
+                EdgeIsUnder(vehicle.RightEdge),
+                EdgeOnEitherSide,
+            }.Any((x) => x);    
         }
 
         private bool IsOffscreen(Vehicle vehicle)

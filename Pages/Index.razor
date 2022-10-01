@@ -34,7 +34,7 @@
     }
 
     // Passing the context as a parameter to ensure it is non-nullable
-    private List<ILane> CreateLanes(Canvas2DContext context)
+    private List<ILane> CreateLanes(Canvas2DContext context, FootBridge footBridge)
     {
         var lanes = new List<ILane>(LANE_COUNT);
         float divisions = LANE_COUNT * 2;
@@ -49,7 +49,7 @@
                     Origin = new Point{ X = WIDTH, Y = (int) heightPercentage},
                     Width = WIDTH,
                 };
-                lanes.Add(new Lane(context, config));
+                lanes.Add(new Lane(context, config, footBridge));
             }
             else
             {
@@ -59,7 +59,7 @@
                     Origin = new Point{ X = 0, Y = (int) heightPercentage},
                     Width = WIDTH,
                 };
-                lanes.Add(new Lane(context, config));
+                lanes.Add(new Lane(context, config, footBridge));
             }
         }
         return lanes;
@@ -78,7 +78,20 @@
             await this.context.StrokeAsync();
         }
 
-        var lanes = this.CreateLanes(context!);
+        // Footbridge
+        await this.context.BeginPathAsync();
+        await this.context.MoveToAsync(WIDTH / 2, 0);
+        await this.context.LineToAsync(WIDTH / 2, HEIGHT);
+        await this.context.StrokeAsync();
+
+        var footBridge = new FootBridge
+        {
+            Colour = "black",
+            LeftEdge = (WIDTH / 2) - (STROKE_WIDTH / 2),
+            RightEdge = (WIDTH / 2) + (STROKE_WIDTH / 2),
+        };
+
+        var lanes = this.CreateLanes(context, footBridge);
         var vehicleTypes = new List<Vehicle>() {
             new Vehicle { Colour = "silver", SpawnRate = 0.2261312530508752d },
             new Vehicle { Colour = "white", SpawnRate = 0.20309379786718001d },
