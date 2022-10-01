@@ -43,11 +43,23 @@
             var heightPercentage = HEIGHT * (i / divisions);
             if ((i / divisions) >= 0.5f)
             {
-                lanes.Add(new Lane(context, Direction.Left, new Point{ X = WIDTH, Y = (int) heightPercentage }, WIDTH));
+                var config = new LaneConfig
+                {
+                    Direction = Direction.Left, 
+                    Origin = new Point{ X = WIDTH, Y = (int) heightPercentage},
+                    Width = WIDTH,
+                };
+                lanes.Add(new Lane(context, config));
             }
             else
             {
-                lanes.Add(new Lane(context, Direction.Right, new Point{ X = 0, Y = (int) heightPercentage }, WIDTH));
+                var config = new LaneConfig
+                {
+                    Direction = Direction.Right, 
+                    Origin = new Point{ X = 0, Y = (int) heightPercentage},
+                    Width = WIDTH,
+                };
+                lanes.Add(new Lane(context, config));
             }
         }
         return lanes;

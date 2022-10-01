@@ -12,18 +12,14 @@ namespace Hummer.Model
     public class Lane : ILane
     {
         private readonly Canvas2DContext context;
-        private readonly Direction direction;
-        private readonly Point origin;
-        private readonly int width;
+        private readonly LaneConfig config;
         private const int MAX_VEHICLES = 5;
         private readonly List<Vehicle> movingVehicles = new List<Vehicle>(MAX_VEHICLES);
 
-        public Lane(Canvas2DContext context, Direction direction, Point origin, int width)
+        public Lane(Canvas2DContext context, LaneConfig config)
         {
             this.context = context;
-            this.direction = direction;
-            this.origin = origin;
-            this.width = width;
+            this.config = config;
         }  
 
         public async Task Animate()
@@ -66,7 +62,7 @@ namespace Hummer.Model
 
         private double GetDrawHeight()
         {
-            return this.origin.Y - (Vehicle.InnerWidth / 2) - Vehicle.StrokeWidth;
+            return this.config.Origin.Y - (Vehicle.InnerWidth / 2) - Vehicle.StrokeWidth;
         }
 
         private async Task EraseVehicle(Vehicle currentVehicle)
@@ -87,13 +83,13 @@ namespace Hummer.Model
             }
 
             var someVehicleIsInTheWay = movingVehicles.Any((currentVehicle) => {
-                if (this.direction == Direction.Left)
+                if (this.config.Direction == Direction.Left)
                 {
-                    return (this.origin.X - Vehicle.MinBumperDistance) < currentVehicle.RightEdge;
+                    return (this.config.Origin.X - Vehicle.MinBumperDistance) < currentVehicle.RightEdge;
                 }
                 else
                 {
-                    return currentVehicle.LeftEdge < (this.origin.X + Vehicle.MinBumperDistance);
+                    return currentVehicle.LeftEdge < (this.config.Origin.X + Vehicle.MinBumperDistance);
                 }
             });
 
@@ -102,19 +98,19 @@ namespace Hummer.Model
 
         private bool IsOffscreen(Vehicle vehicle)
         {
-            if (this.direction == Direction.Left)
+            if (this.config.Direction == Direction.Left)
             {
-                return vehicle.RightEdge < (this.origin.X - this.width);
+                return vehicle.RightEdge < (this.config.Origin.X - this.config.Width);
             }
             else
             {
-                return (this.origin.X + this.width) < vehicle.LeftEdge;
+                return (this.config.Origin.X + this.config.Width) < vehicle.LeftEdge;
             }
         }
 
         private void MoveVehicle(Vehicle vehicle)
         {
-            if (this.direction == Direction.Left)
+            if (this.config.Direction == Direction.Left)
             {
                 vehicle.X--;
             }
@@ -131,7 +127,7 @@ namespace Hummer.Model
 
         public void SpawnVehicle(Vehicle vehicle)
         {
-            vehicle.X = this.origin.X;
+            vehicle.X = this.config.Origin.X;
             this.movingVehicles.Add(vehicle);
         }
     }
