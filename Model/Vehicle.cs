@@ -14,12 +14,11 @@ namespace Hummer.Model
     */
     public record class Vehicle
     {
-        public static readonly int InnerLength = Vehicle.Size;
-        public static readonly int InnerWidth = Vehicle.Size;
+        public const int InnerLength = 30;
+        public const int InnerWidth = 20;
         public static int OuterLength => Vehicle.InnerLength + (2 * Vehicle.StrokeWidth);
         public static int OuterWidth => Vehicle.InnerWidth + (2 * Vehicle.StrokeWidth);
         public const int MinBumperDistance = 20;
-        public const int Size = 20;
         public const int StrokeWidth = 2;
 
 
