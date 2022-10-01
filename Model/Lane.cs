@@ -106,7 +106,7 @@ namespace Hummer.Model
             return !someVehicleIsInTheWay;
         }
 
-        public bool IsOffscreen(Vehicle vehicle)
+        private bool IsOffscreen(Vehicle vehicle)
         {
             if (this.direction == Direction.Left)
             {
@@ -118,7 +118,7 @@ namespace Hummer.Model
             }
         }
 
-        public void DespawnVehicle(Vehicle vehicle)
+        private void DespawnVehicle(Vehicle vehicle)
         {
             this.movingVehicles.Remove(vehicle);
         }
