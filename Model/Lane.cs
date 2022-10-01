@@ -51,7 +51,7 @@ namespace Hummer.Model
             await this.context.SetLineWidthAsync(Vehicle.StrokeWidth);
             await this.context.RectAsync(
                 currentVehicle.X,
-                GetDrawHeight(),
+                this.config.Origin.Y - Vehicle.DrawHeightOffset,
                 Vehicle.InnerLength,
                 Vehicle.InnerWidth
             );
@@ -66,7 +66,7 @@ namespace Hummer.Model
                 await this.context.SetFillStyleAsync(this.footBridge.Colour);
                 await this.context.RectAsync(
                     this.footBridge.LeftEdge,
-                    GetDrawHeight() - Vehicle.StrokeWidth,
+                    Vehicle.GetTopEdge(this.config.Origin.Y) - Vehicle.DrawHeightOffset,
                     this.footBridge.Width,
                     Vehicle.OuterWidth
                 );
@@ -74,16 +74,11 @@ namespace Hummer.Model
             }
         }
 
-        private double GetDrawHeight()
-        {
-            return this.config.Origin.Y - (Vehicle.InnerWidth / 2) - Vehicle.StrokeWidth;
-        }
-
         private async Task EraseVehicle(Vehicle currentVehicle)
         {
             await this.context.ClearRectAsync(
                 currentVehicle.LeftEdge,
-                GetDrawHeight() - Vehicle.StrokeWidth,
+                Vehicle.GetTopEdge(this.config.Origin.Y) - Vehicle.DrawHeightOffset,
                 Vehicle.OuterLength,
                 Vehicle.OuterWidth
             );
