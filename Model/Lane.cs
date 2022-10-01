@@ -33,14 +33,8 @@ namespace Hummer.Model
             foreach (var currentVehicle in this.movingVehicles)
             {
                 await this.EraseVehicle(currentVehicle);
-                if (this.direction == Direction.Left)
-                {
-                    currentVehicle.X--;
-                }
-                else
-                {
-                    currentVehicle.X++;
-                }
+
+                this.MoveVehicle(currentVehicle);
 
                 if (this.IsOffscreen(currentVehicle))
                 {
@@ -115,6 +109,18 @@ namespace Hummer.Model
             else
             {
                 return (this.origin.X + this.width) < vehicle.LeftEdge;
+            }
+        }
+
+        private void MoveVehicle(Vehicle vehicle)
+        {
+            if (this.direction == Direction.Left)
+            {
+                vehicle.X--;
+            }
+            else
+            {
+                vehicle.X++;
             }
         }
 
