@@ -30,15 +30,12 @@ namespace Hummer.Model
             
             foreach (var currentVehicle in this.movingVehicles)
             {
-                await this.EraseVehicle(currentVehicle);
-
+                await this.EraseVehicle(currentVehicle);  
                 this.MoveVehicle(currentVehicle);
-
                 if (this.IsOffscreen(currentVehicle))
                 {
                     despawnTasks.Add(new Task(() => DespawnVehicle(currentVehicle)));
                 }
-
                 await this.DrawVehicle(currentVehicle);
             }
 
