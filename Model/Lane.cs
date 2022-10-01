@@ -50,11 +50,8 @@ namespace Hummer.Model
                 await this.DrawVehicle(currentVehicle);
             }
 
-            // Despawn outside of foreach, we can't modify a List in a foreach
-            foreach (var task in despawnTasks)
-            {
-                task.Start();
-            }
+            // despawn here as we can't modify Lists inside a foreach keyword
+            despawnTasks.ForEach((t) => t.Start());
         }
 
         private async Task DrawVehicle(Vehicle currentVehicle)
