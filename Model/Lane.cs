@@ -62,26 +62,26 @@ namespace Hummer.Model
             await this.context.SetLineWidthAsync(Vehicle.StrokeWidth);
             await this.context.RectAsync(
                 currentVehicle.X,
-                GetDrawHeight(currentVehicle),
-                currentVehicle.Length,
-                currentVehicle.Width
+                GetDrawHeight(),
+                Vehicle.InnerLength,
+                Vehicle.InnerWidth
             );
             await this.context.FillAsync();
             await this.context.StrokeAsync();
         }
 
-        private double GetDrawHeight(Vehicle currentVehicle)
+        private double GetDrawHeight()
         {
-            return this.origin.Y - (currentVehicle.Width / 2) - Vehicle.StrokeWidth;
+            return this.origin.Y - (Vehicle.InnerWidth / 2) - Vehicle.StrokeWidth;
         }
 
         private async Task EraseVehicle(Vehicle currentVehicle)
         {
             await this.context.ClearRectAsync(
                 currentVehicle.LeftEdge,
-                GetDrawHeight(currentVehicle) - Vehicle.StrokeWidth,
-                currentVehicle.TotalLength,
-                currentVehicle.TotalWidth
+                GetDrawHeight() - Vehicle.StrokeWidth,
+                Vehicle.OuterLength,
+                Vehicle.OuterWidth
             );
         }
 
