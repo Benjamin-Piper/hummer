@@ -92,9 +92,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        // Setup canvas
         this.context = await this.canvasReference.CreateCanvas2DAsync();
         await this.context.SetLineWidthAsync(STROKE_WIDTH);
 
+        // Draw lane lines
         foreach (var currentHeight in this.GetLaneLineHeights())
         {
             await this.context.BeginPathAsync();
@@ -103,12 +105,13 @@
             await this.context.StrokeAsync();
         }
 
-        // Footbridge
+        // Draw footbridge
         await this.context.BeginPathAsync();
         await this.context.MoveToAsync(WIDTH / 2, 0);
         await this.context.LineToAsync(WIDTH / 2, HEIGHT);
         await this.context.StrokeAsync();
 
+        // Setup objects
         var footbridge = new Footbridge
         {
             Colour = "black",

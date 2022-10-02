@@ -43,9 +43,11 @@ namespace Hummer.Model
 
             if (this.movingVehicles.Any((v) => this.IsUnderFootbridge(v)))
             {
-                // We must draw this again instead of 
-                // using globalCompositeOperation = "destination-over"
-                // Because we constantly erase the vehicle
+                /* 
+                   We must draw this again instead of 
+                   using globalCompositeOperation = "destination-over"
+                   Because we constantly erase the vehicle
+                */
                 await this.DrawFootBridge();
                 this.config.PlayNote();
                 this.noteIsPlaying = true;
@@ -75,7 +77,6 @@ namespace Hummer.Model
 
         private async Task DrawVehicle(Vehicle currentVehicle)
         {
-            // Must be called before every drawing. Not including this cost me hours of debugging :(
             await this.context.BeginPathAsync();
             await this.context.SetFillStyleAsync(currentVehicle.Colour);
             await this.context.SetLineWidthAsync(Vehicle.StrokeWidth);
@@ -91,6 +92,10 @@ namespace Hummer.Model
 
         private async Task EraseVehicle(Vehicle currentVehicle)
         {
+            /*
+               We first drew a vehicle, then added stroke (border)
+               Now we are erasing the vehicle AND the stroke all at once
+            */
             await this.context.ClearRectAsync(
                 currentVehicle.LeftEdge,
                 Vehicle.GetTopEdge(this.config.Origin.Y) - Vehicle.DrawHeightOffset,
