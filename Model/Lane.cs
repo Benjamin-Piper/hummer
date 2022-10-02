@@ -170,11 +170,11 @@ namespace Hummer.Model
         {
             if (this.config.Direction == Direction.Left)
             {
-                vehicle.X = this.config.Origin.X;
+                vehicle.X = this.config.Origin.X + Vehicle.MinBumperDistance;
             }
             else
             {
-                vehicle.X -= vehicle.RightEdge;
+                vehicle.X = this.config.Origin.X - Vehicle.MinBumperDistance;
             }
             this.movingVehicles.Add(vehicle);
         }
