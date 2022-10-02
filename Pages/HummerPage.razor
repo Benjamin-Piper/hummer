@@ -43,7 +43,7 @@
     }
 
     // Passing the context as a parameter to ensure it is non-nullable
-    private List<ILane> CreateLanes(Canvas2DContext context, FootBridge footBridge)
+    private List<ILane> CreateLanes(Canvas2DContext context, Footbridge footbridge)
     {
         var lanes = new List<ILane>(LANE_COUNT);
         int currentLane = 0;
@@ -61,7 +61,7 @@
                     PauseNote = this.PauseOscillator(currentLane),
                     Width = WIDTH,
                 };
-                lanes.Add(new Lane(context, config, footBridge));
+                lanes.Add(new Lane(context, config, footbridge));
             }
             else
             {
@@ -73,7 +73,7 @@
                     PauseNote = this.PauseOscillator(currentLane),
                     Width = WIDTH,
                 };
-                lanes.Add(new Lane(context, config, footBridge));
+                lanes.Add(new Lane(context, config, footbridge));
             }
             currentLane++;
         }
@@ -109,7 +109,7 @@
         await this.context.LineToAsync(WIDTH / 2, HEIGHT);
         await this.context.StrokeAsync();
 
-        var footBridge = new FootBridge
+        var footbridge = new Footbridge
         {
             Colour = "black",
             LeftEdge = (WIDTH / 2) - (STROKE_WIDTH / 2),
@@ -118,7 +118,7 @@
 
         await JsRuntime.InvokeVoidAsync("initialiseOscillators", new object[] {LANE_COUNT, frequencies.Values});
 
-        var lanes = this.CreateLanes(context, footBridge);
+        var lanes = this.CreateLanes(context, footbridge);
         var vehicleTypes = new List<Vehicle>() {
             new Vehicle { Colour = "silver", SpawnRate = 0.2261312530508752d },
             new Vehicle { Colour = "white", SpawnRate = 0.20309379786718001d },

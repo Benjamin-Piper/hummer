@@ -1,6 +1,6 @@
 namespace Hummer.Model
 {
-    public readonly record struct FootBridge
+    public readonly record struct Footbridge
     {
         public string Colour { get; init; }
         public int LeftEdge { get; init; }

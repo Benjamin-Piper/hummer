@@ -13,17 +13,17 @@ namespace Hummer.Model
     {
         private readonly Canvas2DContext context;
         private readonly LaneConfig config;
-        private readonly FootBridge footBridge;
+        private readonly Footbridge footbridge;
         private const int MAX_VEHICLES = 5;
         private readonly List<Vehicle> movingVehicles = new List<Vehicle>(MAX_VEHICLES);
 
         private bool noteIsPlaying = false;
 
-        public Lane(Canvas2DContext context, LaneConfig config, FootBridge footBridge)
+        public Lane(Canvas2DContext context, LaneConfig config, Footbridge footbridge)
         {
             this.context = context;
             this.config = config;
-            this.footBridge = footBridge;
+            this.footbridge = footbridge;
         }  
 
         public async Task Animate()
@@ -41,7 +41,7 @@ namespace Hummer.Model
                 await this.DrawVehicle(currentVehicle);
             }
 
-            if (this.movingVehicles.Any((v) => this.IsUnderFootBridge(v)))
+            if (this.movingVehicles.Any((v) => this.IsUnderFootbridge(v)))
             {
                 // We must draw this again instead of 
                 // using globalCompositeOperation = "destination-over"
@@ -63,11 +63,11 @@ namespace Hummer.Model
         private async Task DrawFootBridge()
         {
             await this.context.BeginPathAsync();
-            await this.context.SetFillStyleAsync(this.footBridge.Colour);
+            await this.context.SetFillStyleAsync(this.footbridge.Colour);
             await this.context.RectAsync(
-                this.footBridge.LeftEdge,
+                this.footbridge.LeftEdge,
                 Vehicle.GetTopEdge(this.config.Origin.Y) - Vehicle.DrawHeightOffset,
-                this.footBridge.Width,
+                this.footbridge.Width,
                 Vehicle.OuterWidth
             );
             await this.context.FillAsync();
@@ -120,10 +120,10 @@ namespace Hummer.Model
             return !someVehicleIsInTheWay;
         }
 
-        private bool IsUnderFootBridge(Vehicle vehicle)
+        private bool IsUnderFootbridge(Vehicle vehicle)
         {
-            var EdgeIsUnder = (int x) => this.footBridge.LeftEdge <= x && x <= this.footBridge.RightEdge;
-            var EdgeOnEitherSide = vehicle.LeftEdge < this.footBridge.LeftEdge && this.footBridge.RightEdge < vehicle.RightEdge;
+            var EdgeIsUnder = (int x) => this.footbridge.LeftEdge <= x && x <= this.footbridge.RightEdge;
+            var EdgeOnEitherSide = vehicle.LeftEdge < this.footbridge.LeftEdge && this.footbridge.RightEdge < vehicle.RightEdge;
             return new List<bool>()
             {
                 EdgeIsUnder(vehicle.LeftEdge),
