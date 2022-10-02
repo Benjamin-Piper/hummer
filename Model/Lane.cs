@@ -37,10 +37,30 @@ namespace Hummer.Model
                     despawnTasks.Add(new Task(() => DespawnVehicle(currentVehicle)));
                 }
                 await this.DrawVehicle(currentVehicle);
+                if (this.IsUnderFootBridge(currentVehicle))
+                {
+                    // We must draw this again instead of 
+                    // using globalCompositeOperation = "destination-over"
+                    // Because we constantly erase the vehicle
+                    await this.DrawFootBridge();
+                }
             }
 
             // despawn here as we can't modify Lists inside a foreach keyword
             despawnTasks.ForEach((t) => t.Start());
+        }
+
+        private async Task DrawFootBridge()
+        {
+            await this.context.BeginPathAsync();
+            await this.context.SetFillStyleAsync(this.footBridge.Colour);
+            await this.context.RectAsync(
+                this.footBridge.LeftEdge,
+                Vehicle.GetTopEdge(this.config.Origin.Y) - Vehicle.DrawHeightOffset,
+                this.footBridge.Width,
+                Vehicle.OuterWidth
+            );
+            await this.context.FillAsync();
         }
 
         private async Task DrawVehicle(Vehicle currentVehicle)
@@ -57,21 +77,6 @@ namespace Hummer.Model
             );
             await this.context.FillAsync();
             await this.context.StrokeAsync();
-
-            if (this.IsUnderFootBridge(currentVehicle))
-            {
-                // We redraw this instead of setting globalCompositeOperation to destination-over
-                // Is because we are constantly erasing the vehicles
-                await this.context.BeginPathAsync();
-                await this.context.SetFillStyleAsync(this.footBridge.Colour);
-                await this.context.RectAsync(
-                    this.footBridge.LeftEdge,
-                    Vehicle.GetTopEdge(this.config.Origin.Y) - Vehicle.DrawHeightOffset,
-                    this.footBridge.Width,
-                    Vehicle.OuterWidth
-                );
-                await this.context.FillAsync();
-            }
         }
 
         private async Task EraseVehicle(Vehicle currentVehicle)
