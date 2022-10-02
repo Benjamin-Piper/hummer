@@ -153,7 +153,14 @@ namespace Hummer.Model
 
         public void SpawnVehicle(Vehicle vehicle)
         {
-            vehicle.X = this.config.Origin.X;
+            if (this.config.Direction == Direction.Left)
+            {
+                vehicle.X = this.config.Origin.X;
+            }
+            else
+            {
+                vehicle.X -= vehicle.RightEdge;
+            }
             this.movingVehicles.Add(vehicle);
         }
     }
