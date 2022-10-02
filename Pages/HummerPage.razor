@@ -95,6 +95,7 @@
         // Setup canvas
         this.context = await this.canvasReference.CreateCanvas2DAsync();
         await this.context.SetLineWidthAsync(STROKE_WIDTH);
+        await JsRuntime.InvokeVoidAsync("initialiseOscillators", new object[] {LANE_COUNT, frequencies.Values});
 
         // Draw lane lines
         foreach (var currentHeight in this.GetLaneLineHeights())
@@ -118,9 +119,6 @@
             LeftEdge = (WIDTH / 2) - (STROKE_WIDTH / 2),
             RightEdge = (WIDTH / 2) + (STROKE_WIDTH / 2),
         };
-
-        await JsRuntime.InvokeVoidAsync("initialiseOscillators", new object[] {LANE_COUNT, frequencies.Values});
-
         var lanes = this.CreateLanes(context, footbridge);
         var vehicleTypes = new List<Vehicle>() {
             new Vehicle { Colour = "silver", SpawnRate = 0.2261312530508752d },
@@ -138,8 +136,8 @@
             new Vehicle { Colour = "cream", SpawnRate = 0.005569234018004563d },
             new Vehicle { Colour = "pink", SpawnRate = 0.0014273122764923085d },
         };
-
         ISimulation simulation = new Traffic(lanes, vehicleTypes);
+
         await simulation.StartClock();
     }
 }
