@@ -6,6 +6,8 @@ namespace Hummer.Model
     {
         public Direction Direction { get; init; }
         public Point Origin { get; init; }
+        public Action PlayNote { get; init; }
+        public Action PauseNote { get; init; }
         public int Width { get; init; }
     }
 }

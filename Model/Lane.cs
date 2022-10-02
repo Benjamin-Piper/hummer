@@ -17,6 +17,8 @@ namespace Hummer.Model
         private const int MAX_VEHICLES = 5;
         private readonly List<Vehicle> movingVehicles = new List<Vehicle>(MAX_VEHICLES);
 
+        private bool noteIsPlaying = false;
+
         public Lane(Canvas2DContext context, LaneConfig config, FootBridge footBridge)
         {
             this.context = context;
@@ -37,13 +39,21 @@ namespace Hummer.Model
                     despawnTasks.Add(new Task(() => DespawnVehicle(currentVehicle)));
                 }
                 await this.DrawVehicle(currentVehicle);
-                if (this.IsUnderFootBridge(currentVehicle))
-                {
-                    // We must draw this again instead of 
-                    // using globalCompositeOperation = "destination-over"
-                    // Because we constantly erase the vehicle
-                    await this.DrawFootBridge();
-                }
+            }
+
+            if (this.movingVehicles.Any((v) => this.IsUnderFootBridge(v)))
+            {
+                // We must draw this again instead of 
+                // using globalCompositeOperation = "destination-over"
+                // Because we constantly erase the vehicle
+                await this.DrawFootBridge();
+                this.config.PlayNote();
+                this.noteIsPlaying = true;
+            }
+            else if (this.noteIsPlaying)
+            {
+                this.config.PauseNote();
+                this.noteIsPlaying = false;
             }
 
             // despawn here as we can't modify Lists inside a foreach keyword

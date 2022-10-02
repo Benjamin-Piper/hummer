@@ -10,6 +10,15 @@
     private const int LANE_COUNT = 4;
     private const int STROKE_WIDTH = 10;
 
+    /// <summary>Using equal temperament</summary>
+    private readonly IDictionary<string, float> frequencies = new Dictionary<string, float>
+    {
+        {"E5", 659.25f},
+        {"C5", 523.25f},
+        {"A4", 440f},
+        {"F4", 349.23f},
+    };
+
     private BECanvasComponent? canvasReference;
     private Canvas2DContext? context;
 
@@ -37,6 +46,7 @@
     private List<ILane> CreateLanes(Canvas2DContext context, FootBridge footBridge)
     {
         var lanes = new List<ILane>(LANE_COUNT);
+        int currentLane = 0;
         float divisions = LANE_COUNT * 2;
         for (int i = 1; i <= divisions; i += 2)
         {
@@ -47,6 +57,8 @@
                 {
                     Direction = Direction.Left, 
                     Origin = new Point{ X = WIDTH, Y = (int) heightPercentage},
+                    PlayNote = this.PlayOscillator(currentLane),
+                    PauseNote = this.PauseOscillator(currentLane),
                     Width = WIDTH,
                 };
                 lanes.Add(new Lane(context, config, footBridge));
@@ -57,12 +69,25 @@
                 {
                     Direction = Direction.Right, 
                     Origin = new Point{ X = 0, Y = (int) heightPercentage},
+                    PlayNote = this.PlayOscillator(currentLane),
+                    PauseNote = this.PauseOscillator(currentLane),
                     Width = WIDTH,
                 };
                 lanes.Add(new Lane(context, config, footBridge));
             }
+            currentLane++;
         }
         return lanes;
+    }
+
+    private Action PlayOscillator(int index)
+    {
+        return () => JsRuntime.InvokeVoidAsync("playOscillator", new object[] {index});
+    }
+
+    private Action PauseOscillator(int index)
+    {
+        return () => JsRuntime.InvokeVoidAsync("pauseOscillator", new object[] {index});
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -91,7 +116,7 @@
             RightEdge = (WIDTH / 2) + (STROKE_WIDTH / 2),
         };
 
-        await JsRuntime.InvokeVoidAsync("playNote", "F4");
+        await JsRuntime.InvokeVoidAsync("initialiseOscillators", new object[] {LANE_COUNT, frequencies.Values});
 
         var lanes = this.CreateLanes(context, footBridge);
         var vehicleTypes = new List<Vehicle>() {
