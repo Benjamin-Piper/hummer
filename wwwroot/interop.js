@@ -4,6 +4,10 @@ const VOLUME_ON = 0.01;
 const gainNodeList = [];
 const oscillatorList = [];
 
+function getWidth() {
+    return window.innerWidth;
+}
+
 function initialiseOscillators(oscillatorCount, frequencies) {
     const audioContext = new AudioContext();
 

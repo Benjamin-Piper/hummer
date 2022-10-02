@@ -1,12 +1,15 @@
 ﻿@inject IJSRuntime JsRuntime
 
-<h1>Hummer</h1>
+<h1 class="canvas-heading">Hummer</h1>
 
-<BECanvas Width="@WIDTH" Height="@HEIGHT" @ref="canvasReference"></BECanvas>
+<BECanvas Width="@this.CanvasWidth" Height="@this.CanvasHeight" @ref="canvasReference"></BECanvas>
 
 @code {
-    private const int WIDTH = 1000;
-    private const int HEIGHT = 400;
+    [Parameter]
+    public int CanvasWidth { get; set; }
+    [Parameter]
+    public int CanvasHeight { get; set; }
+
     private const int LANE_COUNT = 4;
     private const int STROKE_WIDTH = 10;
 
@@ -28,7 +31,7 @@
         float divisions = LANE_COUNT * 2;
         for (int i = 0; i <= divisions; i += 2)
         {
-            var heightPercentage = HEIGHT * (i / divisions);
+            var heightPercentage = this.CanvasHeight * (i / divisions);
             var offset = STROKE_WIDTH / 2;
             if (i == 0)
             {
@@ -50,16 +53,16 @@
         float divisions = LANE_COUNT * 2;
         for (int i = 1; i <= divisions; i += 2)
         {
-            var heightPercentage = HEIGHT * (i / divisions);
+            var heightPercentage = this.CanvasHeight * (i / divisions);
             if ((i / divisions) >= 0.5f)
             {
                 var config = new LaneConfig
                 {
                     Direction = Direction.Left, 
-                    Origin = new Point{ X = WIDTH, Y = (int) heightPercentage},
+                    Origin = new Point{ X = this.CanvasWidth, Y = (int) heightPercentage},
                     PlayNote = this.PlayOscillator(currentLane),
                     PauseNote = this.PauseOscillator(currentLane),
-                    Width = WIDTH,
+                    Width = this.CanvasWidth,
                 };
                 lanes.Add(new Lane(context, config, footbridge));
             }
@@ -71,7 +74,7 @@
                     Origin = new Point{ X = 0, Y = (int) heightPercentage},
                     PlayNote = this.PlayOscillator(currentLane),
                     PauseNote = this.PauseOscillator(currentLane),
-                    Width = WIDTH,
+                    Width = this.CanvasWidth,
                 };
                 lanes.Add(new Lane(context, config, footbridge));
             }
@@ -102,22 +105,22 @@
         {
             await this.context.BeginPathAsync();
             await this.context.MoveToAsync(0, currentHeight);
-            await this.context.LineToAsync(WIDTH, currentHeight);
+            await this.context.LineToAsync(this.CanvasWidth, currentHeight);
             await this.context.StrokeAsync();
         }
 
         // Draw footbridge
         await this.context.BeginPathAsync();
-        await this.context.MoveToAsync(WIDTH / 2, 0);
-        await this.context.LineToAsync(WIDTH / 2, HEIGHT);
+        await this.context.MoveToAsync(this.CanvasWidth / 2, 0);
+        await this.context.LineToAsync(this.CanvasWidth / 2, this.CanvasHeight);
         await this.context.StrokeAsync();
 
         // Setup objects
         var footbridge = new Footbridge
         {
             Colour = "black",
-            LeftEdge = (WIDTH / 2) - (STROKE_WIDTH / 2),
-            RightEdge = (WIDTH / 2) + (STROKE_WIDTH / 2),
+            LeftEdge = (this.CanvasWidth / 2) - (STROKE_WIDTH / 2),
+            RightEdge = (this.CanvasWidth / 2) + (STROKE_WIDTH / 2),
         };
         var lanes = this.CreateLanes(context, footbridge);
         var vehicleTypes = new List<Vehicle>() {

@@ -1,8 +1,10 @@
 @page "/"
 
+@inject IJSRuntime JsRuntime
+
 @if (appHasStarted)
 {
-    <HummerPage />
+    <HummerPage CanvasWidth="@width" CanvasHeight="400" />
 }
 else 
 {
@@ -14,9 +16,16 @@ else
 @code {
     private const string buttonName = "proceed";
     private bool appHasStarted = false;
+    private int width;
 
     private void StartApp()
     {
-        appHasStarted = true;
+        this.appHasStarted = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.width = await JsRuntime.InvokeAsync<int>("getWidth");
     }
 }
+
