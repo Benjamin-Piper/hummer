@@ -1,0 +1,117 @@
+﻿@inject IJSRuntime JsRuntime
+
+<h1>Hummer</h1>
+
+<BECanvas Width="@WIDTH" Height="@HEIGHT" @ref="canvasReference"></BECanvas>
+
+@code {
+    private const int WIDTH = 1000;
+    private const int HEIGHT = 400;
+    private const int LANE_COUNT = 4;
+    private const int STROKE_WIDTH = 10;
+
+    private BECanvasComponent? canvasReference;
+    private Canvas2DContext? context;
+
+    private List<int> GetLaneLineHeights()
+    {
+        var laneLineHeights = new List<int>(LANE_COUNT + 1);
+        float divisions = LANE_COUNT * 2;
+        for (int i = 0; i <= divisions; i += 2)
+        {
+            var heightPercentage = HEIGHT * (i / divisions);
+            var offset = STROKE_WIDTH / 2;
+            if (i == 0)
+            {
+                laneLineHeights.Add(offset);
+            }
+            else
+            {
+                laneLineHeights.Add((int) heightPercentage - offset);
+            }
+        }
+        return laneLineHeights;
+    }
+
+    // Passing the context as a parameter to ensure it is non-nullable
+    private List<ILane> CreateLanes(Canvas2DContext context, FootBridge footBridge)
+    {
+        var lanes = new List<ILane>(LANE_COUNT);
+        float divisions = LANE_COUNT * 2;
+        for (int i = 1; i <= divisions; i += 2)
+        {
+            var heightPercentage = HEIGHT * (i / divisions);
+            if ((i / divisions) >= 0.5f)
+            {
+                var config = new LaneConfig
+                {
+                    Direction = Direction.Left, 
+                    Origin = new Point{ X = WIDTH, Y = (int) heightPercentage},
+                    Width = WIDTH,
+                };
+                lanes.Add(new Lane(context, config, footBridge));
+            }
+            else
+            {
+                var config = new LaneConfig
+                {
+                    Direction = Direction.Right, 
+                    Origin = new Point{ X = 0, Y = (int) heightPercentage},
+                    Width = WIDTH,
+                };
+                lanes.Add(new Lane(context, config, footBridge));
+            }
+        }
+        return lanes;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        this.context = await this.canvasReference.CreateCanvas2DAsync();
+        await this.context.SetLineWidthAsync(STROKE_WIDTH);
+
+        foreach (var currentHeight in this.GetLaneLineHeights())
+        {
+            await this.context.BeginPathAsync();
+            await this.context.MoveToAsync(0, currentHeight);
+            await this.context.LineToAsync(WIDTH, currentHeight);
+            await this.context.StrokeAsync();
+        }
+
+        // Footbridge
+        await this.context.BeginPathAsync();
+        await this.context.MoveToAsync(WIDTH / 2, 0);
+        await this.context.LineToAsync(WIDTH / 2, HEIGHT);
+        await this.context.StrokeAsync();
+
+        var footBridge = new FootBridge
+        {
+            Colour = "black",
+            LeftEdge = (WIDTH / 2) - (STROKE_WIDTH / 2),
+            RightEdge = (WIDTH / 2) + (STROKE_WIDTH / 2),
+        };
+
+        await JsRuntime.InvokeVoidAsync("playNote", "F4");
+
+        var lanes = this.CreateLanes(context, footBridge);
+        var vehicleTypes = new List<Vehicle>() {
+            new Vehicle { Colour = "silver", SpawnRate = 0.2261312530508752d },
+            new Vehicle { Colour = "white", SpawnRate = 0.20309379786718001d },
+            new Vehicle { Colour = "blue", SpawnRate = 0.12751147282100564d },
+            new Vehicle { Colour = "grey", SpawnRate = 0.10389884636748835d },
+            new Vehicle { Colour = "black", SpawnRate = 0.10332750064651776d },
+            new Vehicle { Colour = "red", SpawnRate = 0.10327815106633349d },
+            new Vehicle { Colour = "green", SpawnRate = 0.0577977309904652d },
+            new Vehicle { Colour = "gold", SpawnRate = 0.019150314995692433d },
+            new Vehicle { Colour = "brown", SpawnRate = 0.016805827382054505d },
+            new Vehicle { Colour = "yellow", SpawnRate = 0.014376795138798564d },
+            new Vehicle { Colour = "orange", SpawnRate = 0.011366088192673002d },
+            new Vehicle { Colour = "purple", SpawnRate = 0.006265675186418996d },
+            new Vehicle { Colour = "cream", SpawnRate = 0.005569234018004563d },
+            new Vehicle { Colour = "pink", SpawnRate = 0.0014273122764923085d },
+        };
+
+        ISimulation simulation = new Traffic(lanes, vehicleTypes);
+        await simulation.StartClock();
+    }
+}
