@@ -1,6 +1,6 @@
 const PLAY_NOTHING = 0;
 const VOLUME_OFF = 0;
-const VOLUME_ON = 0.05;
+const VOLUME_ON = 0.01;
 const gainNodeList = [];
 const oscillatorList = [];
 
