@@ -19,6 +19,11 @@ jobs:
       - name: Publish .NET Core Project
         run: dotnet publish Hummer.csproj -c Release -o release -nologo
 
+
+      # Jekyll projects prohibit files and folders starting with _
+      - name: Add .nojekyll file
+        run: touch release/wwwroot/.nojekyll
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
