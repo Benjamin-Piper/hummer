@@ -1,0 +1,169 @@
+﻿@inject IJSRuntime JsRuntime
+
+<h1 class="canvas-heading">Hummer</h1>
+
+<BECanvas Width="@this.CanvasWidth" Height="@this.CanvasHeight" @ref="this.canvasReference" />
+
+@if (!string.IsNullOrEmpty(this.error))
+{
+    <p class="error">@this.error</p>
+}
+
+@code {
+    [Parameter]
+    public int CanvasWidth { get; set; }
+    [Parameter]
+    public int CanvasHeight { get; set; }
+
+    private const int LANE_COUNT = 4;
+    private const int STROKE_WIDTH = 10;
+
+    /// <summary>Using equal temperament</summary>
+    private readonly IDictionary<string, float> frequencies = new Dictionary<string, float>
+    {
+        {"E5", 659.25f},
+        {"C5", 523.25f},
+        {"A4", 440f},
+        {"F4", 349.23f},
+    };
+
+    private BECanvasComponent? canvasReference;
+    private Canvas2DContext? context;
+
+    private string error = "";
+
+    private List<int> GetLaneLineHeights()
+    {
+        var laneLineHeights = new List<int>(LANE_COUNT + 1);
+        float divisions = LANE_COUNT * 2;
+        for (int i = 0; i <= divisions; i += 2)
+        {
+            var heightPercentage = this.CanvasHeight * (i / divisions);
+            var offset = STROKE_WIDTH / 2;
+            if (i == 0)
+            {
+                laneLineHeights.Add(offset);
+            }
+            else
+            {
+                laneLineHeights.Add((int) heightPercentage - offset);
+            }
+        }
+        return laneLineHeights;
+    }
+
+    // Passing the context as a parameter to ensure it is non-nullable
+    private List<ILane> CreateLanes(Canvas2DContext context, Footbridge footbridge)
+    {
+        var lanes = new List<ILane>(LANE_COUNT);
+        int currentLane = 0;
+        float divisions = LANE_COUNT * 2;
+        for (int i = 1; i <= divisions; i += 2)
+        {
+            var heightPercentage = this.CanvasHeight * (i / divisions);
+            if ((i / divisions) >= 0.5f)
+            {
+                var config = new LaneConfig
+                {
+                    Direction = Direction.Left, 
+                    Origin = new Point{ X = this.CanvasWidth, Y = (int) heightPercentage},
+                    PlayNote = this.PlayOscillator(currentLane),
+                    PauseNote = this.PauseOscillator(currentLane),
+                    Width = this.CanvasWidth,
+                };
+                lanes.Add(new Lane(context, config, footbridge));
+            }
+            else
+            {
+                var config = new LaneConfig
+                {
+                    Direction = Direction.Right, 
+                    Origin = new Point{ X = 0, Y = (int) heightPercentage},
+                    PlayNote = this.PlayOscillator(currentLane),
+                    PauseNote = this.PauseOscillator(currentLane),
+                    Width = this.CanvasWidth,
+                };
+                lanes.Add(new Lane(context, config, footbridge));
+            }
+            currentLane++;
+        }
+        return lanes;
+    }
+
+    private Action PlayOscillator(int index)
+    {
+        return () => JsRuntime.InvokeVoidAsync("playOscillator", new object[] {index});
+    }
+
+    private Action PauseOscillator(int index)
+    {
+        return () => JsRuntime.InvokeVoidAsync("pauseOscillator", new object[] {index});
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (string.IsNullOrEmpty(this.error))
+        {
+            await this.Main();
+        }
+    }
+
+    private async Task Main()
+    {
+        // Setup canvas
+        this.context = await this.canvasReference.CreateCanvas2DAsync();
+        await this.context.SetLineWidthAsync(STROKE_WIDTH);
+        await JsRuntime.InvokeVoidAsync("initialiseOscillators", new object[] {LANE_COUNT, frequencies.Values});
+
+        // Draw lane lines
+        foreach (var currentHeight in this.GetLaneLineHeights())
+        {
+            await this.context.BeginPathAsync();
+            await this.context.MoveToAsync(0, currentHeight);
+            await this.context.LineToAsync(this.CanvasWidth, currentHeight);
+            await this.context.StrokeAsync();
+        }
+
+        // Draw footbridge
+        await this.context.BeginPathAsync();
+        await this.context.MoveToAsync(this.CanvasWidth / 2, 0);
+        await this.context.LineToAsync(this.CanvasWidth / 2, this.CanvasHeight);
+        await this.context.StrokeAsync();
+
+        // Setup objects
+        var footbridge = new Footbridge
+        {
+            Colour = "black",
+            LeftEdge = (this.CanvasWidth / 2) - (STROKE_WIDTH / 2),
+            RightEdge = (this.CanvasWidth / 2) + (STROKE_WIDTH / 2),
+        };
+        var lanes = this.CreateLanes(context, footbridge);
+        var vehicleTypes = new List<Vehicle>() {
+            new Vehicle { Colour = "silver", SpawnRate = 0.2261312530508752d },
+            new Vehicle { Colour = "white", SpawnRate = 0.20309379786718001d },
+            new Vehicle { Colour = "blue", SpawnRate = 0.12751147282100564d },
+            new Vehicle { Colour = "grey", SpawnRate = 0.10389884636748835d },
+            new Vehicle { Colour = "black", SpawnRate = 0.10332750064651776d },
+            new Vehicle { Colour = "red", SpawnRate = 0.10327815106633349d },
+            new Vehicle { Colour = "green", SpawnRate = 0.0577977309904652d },
+            new Vehicle { Colour = "gold", SpawnRate = 0.019150314995692433d },
+            new Vehicle { Colour = "brown", SpawnRate = 0.016805827382054505d },
+            new Vehicle { Colour = "yellow", SpawnRate = 0.014376795138798564d },
+            new Vehicle { Colour = "orange", SpawnRate = 0.011366088192673002d },
+            new Vehicle { Colour = "purple", SpawnRate = 0.006265675186418996d },
+            new Vehicle { Colour = "cream", SpawnRate = 0.005569234018004563d },
+            new Vehicle { Colour = "pink", SpawnRate = 0.0014273122764923085d },
+        };
+        ISimulation simulation = new Traffic(lanes, vehicleTypes);
+
+        try
+        {
+            await simulation.StartClock();
+        }
+        catch (SpawnRateOutOfRangeException e)
+        {
+            this.error = e.Message;
+            this.StateHasChanged();
+        }
+    }
+}

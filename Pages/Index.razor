@@ -1,9 +1,31 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Index</PageTitle>
+@inject IJSRuntime JsRuntime
 
-<h1>Hello, world!</h1>
+@if (appHasStarted)
+{
+    <HummerPage CanvasWidth="@width" CanvasHeight="400" />
+}
+else 
+{
+    <h1>Welcome</h1>
+    <p>This application plays sounds. Make sure your volume is not muted then click @buttonName.</p>
+    <button @onclick="StartApp">@buttonName</button>
+}
 
-Welcome to your new app.
+@code {
+    private const string buttonName = "proceed";
+    private bool appHasStarted = false;
+    private int width;
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    private void StartApp()
+    {
+        this.appHasStarted = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.width = await JsRuntime.InvokeAsync<int>("getWidth");
+    }
+}
+
