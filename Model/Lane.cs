@@ -180,7 +180,7 @@ namespace Hummer.Model
             }
             else
             {
-                vehicle.X = this.config.Origin.X - Vehicle.MinBumperDistance;
+                vehicle.X = this.config.Origin.X - Vehicle.MinBumperDistance - Vehicle.OuterLength;
             }
             this.movingVehicles.Add(vehicle);
         }
