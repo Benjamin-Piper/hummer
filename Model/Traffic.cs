@@ -26,6 +26,12 @@ namespace Hummer.Model
 
         private Vehicle RandomlyChooseVehicle()
         {
+            Console.WriteLine("here");
+            if (vehicleTypes.Any((v) => !(0 < v.SpawnRate && v.SpawnRate < 1)))
+            {
+                throw new SpawnRateOutOfRangeException("All vehicle SpawnRates must be between 0 and 1");
+            }
+
             var spawnNumber = this.random.NextDouble();
             var lowerBound = 0d;
             var upperBound = 0d;
@@ -38,11 +44,7 @@ namespace Hummer.Model
                 }
                 lowerBound += candidateVehicle.SpawnRate;
             }
-            if (upperBound <= spawnNumber)
-            {
-                return vehicleTypes.Last();
-            }
-            throw new SpawnRateOutOfRangeException("There must be at least one vehicle.SpawnRate between 0 and 1");
+            return vehicleTypes.Last() with {};
         }
 
         public async Task StartClock()

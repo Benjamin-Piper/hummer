@@ -10,3 +10,7 @@ button {
 .canvas-heading {
     margin-bottom: 40px;
 }
+
+.error {
+    color: red;
+}

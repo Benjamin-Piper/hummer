@@ -2,7 +2,12 @@
 
 <h1 class="canvas-heading">Hummer</h1>
 
-<BECanvas Width="@this.CanvasWidth" Height="@this.CanvasHeight" @ref="canvasReference"></BECanvas>
+<BECanvas Width="@this.CanvasWidth" Height="@this.CanvasHeight" @ref="this.canvasReference" />
+
+@if (!string.IsNullOrEmpty(this.error))
+{
+    <p class="error">@this.error</p>
+}
 
 @code {
     [Parameter]
@@ -24,6 +29,8 @@
 
     private BECanvasComponent? canvasReference;
     private Canvas2DContext? context;
+
+    private string error = "";
 
     private List<int> GetLaneLineHeights()
     {
@@ -95,6 +102,14 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (string.IsNullOrEmpty(this.error))
+        {
+            await this.Main();
+        }
+    }
+
+    private async Task Main()
+    {
         // Setup canvas
         this.context = await this.canvasReference.CreateCanvas2DAsync();
         await this.context.SetLineWidthAsync(STROKE_WIDTH);
@@ -141,6 +156,14 @@
         };
         ISimulation simulation = new Traffic(lanes, vehicleTypes);
 
-        await simulation.StartClock();
+        try
+        {
+            await simulation.StartClock();
+        }
+        catch (SpawnRateOutOfRangeException e)
+        {
+            this.error = e.Message;
+            this.StateHasChanged();
+        }
     }
 }
