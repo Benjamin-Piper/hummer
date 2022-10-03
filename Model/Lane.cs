@@ -38,7 +38,10 @@ namespace Hummer.Model
                 {
                     despawnTasks.Add(new Task(() => DespawnVehicle(currentVehicle)));
                 }
-                await this.DrawVehicle(currentVehicle);
+                else
+                {
+                    await this.DrawVehicle(currentVehicle);
+                }
             }
 
             if (this.movingVehicles.Any((v) => this.IsUnderFootbridge(v)))
@@ -49,8 +52,11 @@ namespace Hummer.Model
                    Because we constantly erase the vehicle
                 */
                 await this.DrawFootBridge();
-                this.config.PlayNote();
-                this.noteIsPlaying = true;
+                if (!this.noteIsPlaying)
+                {
+                    this.config.PlayNote();
+                    this.noteIsPlaying = true;
+                }
             }
             else if (this.noteIsPlaying)
             {
