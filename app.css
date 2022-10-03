@@ -1,0 +1,16 @@
+body {
+    margin: 0;
+    text-align: center;
+}
+
+button {
+    cursor: pointer;
+}
+
+.canvas-heading {
+    margin-bottom: 40px;
+}
+
+.error {
+    color: red;
+}
